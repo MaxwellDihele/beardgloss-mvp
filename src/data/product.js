@@ -62,7 +62,7 @@ export const product = {
   ],
   images: [
     { src: '/images/product/beard-gloss-main.jpg', alt: 'BeardGloss pouch, front label detail' },
-    { src: '/images/product/beard-gloss-cart.jpg' }
+    { src: '/images/product/beard-gloss-cart.jpg' },
     { src: '/images/product/beard-gloss-lifestyle.jpg', alt: 'Man holding BeardGloss pouch against the Johannesburg skyline' },
   ]
 };
