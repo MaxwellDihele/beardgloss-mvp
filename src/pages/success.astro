@@ -16,7 +16,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
       <h1 class="mt-6 text-3xl text-bone md:text-4xl">Order confirmed.</h1>
       <p class="mt-3 text-stone">
-        Thank you<span id="success-name"></span> — order <span id="success-order-number" class="text-gold-bright"></span> is being prepared for delivery.
+        Thank you<span id="success-name"></span> — order <span id="success-order-number" class="text-gold-bright"></span> is <span id="success-fulfilment-note">being prepared for delivery</span>.
       </p>
 
       <div class="card mt-10 p-6 text-left">
@@ -28,7 +28,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <span id="success-subtotal"></span>
         </div>
         <div class="flex justify-between text-sm text-stone mb-4">
-          <span>Delivery</span>
+          <span id="success-delivery-label">Delivery</span>
           <span id="success-delivery"></span>
         </div>
         <div class="pour-rule mb-4"></div>
@@ -37,8 +37,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <span id="success-total" class="text-gold-bright"></span>
         </div>
 
-        <h3 class="text-sm text-bone mb-1">Delivering to</h3>
-        <p class="text-sm text-stone" id="success-address"></p>
+        <div id="success-address-block">
+          <h3 class="text-sm text-bone mb-1">Delivering to</h3>
+          <p class="text-sm text-stone" id="success-address"></p>
+        </div>
       </div>
 
       <div class="card mt-8 p-6 text-left">
@@ -72,7 +74,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
       document.getElementById('success-name').textContent = order.customer?.fullName ? `, ${order.customer.fullName.split(' ')[0]}` : '';
       document.getElementById('success-order-number').textContent = `#${order.orderNumber}`;
-      document.getElementById('success-address').textContent = order.customer?.address || '';
+
+      const isPickup = order.fulfilment === 'pickup';
+      document.getElementById('success-fulfilment-note').textContent = isPickup
+        ? 'being prepared for pickup'
+        : 'being prepared for delivery';
+
+      const deliveryLabelEl = document.getElementById('success-delivery-label');
+      if (deliveryLabelEl) deliveryLabelEl.textContent = isPickup ? 'Pickup' : 'Delivery';
+
+      const addressBlock = document.getElementById('success-address-block');
+      if (isPickup) {
+        addressBlock?.classList.add('hidden');
+      } else {
+        document.getElementById('success-address').textContent = order.customer?.address || '';
+      }
 
       const itemsEl = document.getElementById('success-items');
       order.items.forEach((item) => {

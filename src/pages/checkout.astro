@@ -22,6 +22,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <p class="text-xs text-stone -mt-3">We only use these details to fulfil and update you on this order.</p>
 
           <div>
+            <span class="block text-sm text-stone mb-2">Fulfilment</span>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="flex cursor-pointer items-center gap-3 rounded-sm border border-white/10 bg-charcoal-raised px-4 py-3 has-[:checked]:border-gold">
+                <input type="radio" name="fulfilment" value="delivery" checked class="accent-gold" />
+                <span class="text-sm text-bone">Delivery</span>
+              </label>
+              <label class="flex cursor-pointer items-center gap-3 rounded-sm border border-white/10 bg-charcoal-raised px-4 py-3 has-[:checked]:border-gold">
+                <input type="radio" name="fulfilment" value="pickup" class="accent-gold" />
+                <span class="text-sm text-bone">Pickup (Johannesburg)</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
             <label for="fullName" class="block text-sm text-stone mb-2">Full Name</label>
             <input
               id="fullName" name="fullName" type="text" autocomplete="name" required
@@ -53,7 +67,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
             </div>
           </div>
 
-          <div>
+          <div id="address-field">
             <label for="address" class="block text-sm text-stone mb-2">Delivery Address</label>
             <textarea
               id="address" name="address" rows="3" autocomplete="street-address" required
@@ -70,7 +84,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </form>
 
       <aside class="card h-fit p-6" id="order-summary">
-        <h2 class="text-lg text-bone mb-5">Order Summary</h2>
+        <div class="flex items-center justify-between mb-5">
+          <h2 class="text-lg text-bone">Order Summary</h2>
+          <button
+            type="button"
+            id="clear-cart"
+            class="text-xs text-stone underline decoration-white/20 underline-offset-2 transition-colors hover:text-red-400"
+          >
+            Clear cart
+          </button>
+        </div>
         <div id="summary-items" class="space-y-3 mb-5"></div>
         <div class="pour-rule mb-4"></div>
         <div class="flex justify-between text-sm text-stone mb-2">
@@ -78,7 +101,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <span id="checkout-subtotal">R0.00</span>
         </div>
         <div class="flex justify-between text-sm text-stone mb-4">
-          <span>Delivery</span>
+          <span id="checkout-delivery-label">Delivery</span>
           <span id="checkout-delivery">R0.00</span>
         </div>
         <div class="pour-rule mb-4"></div>
@@ -102,13 +125,36 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const summaryItems = document.getElementById('summary-items');
     const subtotalEl = document.getElementById('checkout-subtotal');
     const deliveryEl = document.getElementById('checkout-delivery');
+    const deliveryLabelEl = document.getElementById('checkout-delivery-label');
     const totalEl = document.getElementById('checkout-total');
     const form = document.getElementById('checkout-form');
+    const addressField = document.getElementById('address-field');
+    const addressInput = document.getElementById('address');
+    const fulfilmentInputs = form ? Array.from(form.querySelectorAll('input[name="fulfilment"]')) : [];
+
+    function getFulfilment() {
+      return fulfilmentInputs.find((i) => i.checked)?.value || 'delivery';
+    }
+
+    function updateAddressVisibility() {
+      const isPickup = getFulfilment() === 'pickup';
+      addressField?.classList.toggle('hidden', isPickup);
+      if (addressInput) addressInput.required = !isPickup;
+      if (isPickup) showError('address', false);
+    }
+
+    fulfilmentInputs.forEach((input) => {
+      input.addEventListener('change', () => {
+        updateAddressVisibility();
+        renderSummary();
+      });
+    });
 
     function computeTotals() {
       const subtotal = getCartTotal();
-      const delivery = subtotal === 0 || subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-      return { subtotal, delivery, total: subtotal + delivery };
+      const isPickup = getFulfilment() === 'pickup';
+      const delivery = isPickup || subtotal === 0 || subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
+      return { subtotal, delivery, total: subtotal + delivery, isPickup };
     }
 
     function renderSummary() {
@@ -132,20 +178,31 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         summaryItems.appendChild(row);
       });
 
-      const { subtotal, delivery, total } = computeTotals();
+      const { subtotal, delivery, total, isPickup } = computeTotals();
       subtotalEl.textContent = formatZAR(subtotal);
-      deliveryEl.textContent = delivery === 0 ? 'Free' : formatZAR(delivery);
+      if (deliveryLabelEl) deliveryLabelEl.textContent = isPickup ? 'Pickup' : 'Delivery';
+      deliveryEl.textContent = isPickup ? 'Free' : delivery === 0 ? 'Free' : formatZAR(delivery);
       totalEl.textContent = formatZAR(total);
       return true;
     }
 
-    const hasItems = renderSummary();
+    let hasItems = renderSummary();
+    updateAddressVisibility();
+
+    const clearCartBtn = document.getElementById('clear-cart');
+    clearCartBtn?.addEventListener('click', () => {
+      if (!getCart().length) return;
+      const confirmed = window.confirm('Remove all items from your cart?');
+      if (!confirmed) return;
+      clearCart();
+      hasItems = renderSummary();
+    });
 
     const validators = {
       fullName: (v) => v.trim().length >= 2,
       email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
       phone: (v) => /^[0-9+()\s-]{7,15}$/.test(v.trim()),
-      address: (v) => v.trim().length >= 8,
+      address: (v) => getFulfilment() === 'pickup' || v.trim().length >= 8,
     };
 
     function showError(field, show) {
@@ -172,15 +229,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         return;
       }
 
-      const { subtotal, delivery, total } = computeTotals();
+      const { subtotal, delivery, total, isPickup } = computeTotals();
 
       const order = {
         orderNumber: generateOrderNumber(),
+        fulfilment: getFulfilment(),
         customer: {
           fullName: data.get('fullName'),
           email: data.get('email'),
           phone: data.get('phone'),
-          address: data.get('address'),
+          address: isPickup ? '' : data.get('address'),
         },
         paymentMethod: data.get('payment'),
         items: getCart(),
