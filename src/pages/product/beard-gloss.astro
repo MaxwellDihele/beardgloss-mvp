@@ -65,7 +65,7 @@ import { product, testimonials } from '../../data/product.js';
             data-slug={product.slug}
             class="btn-gold flex-1"
           >
-            Add to Cart
+            Add to Cart &mdash; <span id="cart-btn-total">R{product.price}</span>
           </button>
         </div>
         <p id="add-confirm" class="mt-3 hidden text-sm text-gold-bright">
@@ -123,9 +123,16 @@ import { product, testimonials } from '../../data/product.js';
     const plusBtn = document.getElementById('qty-plus');
     const addBtn = document.getElementById('add-to-cart');
     const confirmMsg = document.getElementById('add-confirm');
+    const cartBtnTotal = document.getElementById('cart-btn-total');
+    const unitPrice = Number(addBtn?.dataset.price || 0);
+
+    function formatZAR(n) {
+      return `R${n.toLocaleString('en-ZA')}`;
+    }
 
     function renderQty() {
       if (qtyValue) qtyValue.textContent = String(quantity);
+      if (cartBtnTotal) cartBtnTotal.textContent = formatZAR(unitPrice * quantity);
     }
 
     minusBtn?.addEventListener('click', () => {
