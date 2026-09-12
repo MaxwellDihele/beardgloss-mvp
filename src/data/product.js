@@ -26,10 +26,7 @@ export const product = {
       title: 'Tames flyaways in one pass',
       description: 'Smooths flyaways and static in one application, even in Highveld dry air or humid coastal heat.',
     },
-    {
-      title: 'Scent that reads, not shouts',
-      description: 'Sandalwood, cedar and a whisper of amber — noticeable up close, forgettable everywhere else.',
-    },
+    
   ],
   ingredients: [
     { name: 'Argan Oil', note: 'Deep conditioning, restores shine' },
