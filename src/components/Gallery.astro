@@ -1,0 +1,45 @@
+---
+const galleryImages = [
+  {
+    src: '/images/product/beard-gloss-collection-dark.jpg',
+    alt: 'The Beard Gloss collection — five scent variants lined up against a dark backdrop',
+  },
+  {
+    src: '/images/product/beard-gloss-collection-cream.jpg',
+    alt: 'The Beard Gloss collection styled with packaging on a cream backdrop',
+  },
+  {
+    src: '/images/product/beard-gloss-main.jpg',
+    alt: 'BeardGloss pouch, front label detail',
+  },
+  {
+    src: '/images/product/beard-gloss-lifestyle.jpg',
+    alt: 'Man holding BeardGloss pouch against the Johannesburg skyline',
+  },
+];
+---
+
+<section class="border-b border-white/5 bg-charcoal/40">
+  <div class="container-page py-16 md:py-24">
+    <p class="eyebrow reveal mb-3">Gallery</p>
+    <h2 class="reveal mb-10 max-w-lg text-3xl text-bone md:text-4xl">
+      A closer look at the collection.
+    </h2>
+
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+      {galleryImages.map((img, i) => (
+        <div
+          class="reveal card overflow-hidden"
+          style={`transition-delay:${i * 80}ms`}
+        >
+          <img
+            src={img.src}
+            alt={img.alt}
+            loading="lazy"
+            class="aspect-[3/4] h-full w-full object-cover transition-transform duration-500 ease-out hover:scale-105"
+          />
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

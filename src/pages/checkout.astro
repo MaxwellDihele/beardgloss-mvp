@@ -64,22 +64,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </div>
         </div>
 
-        <div class="card p-6 space-y-4">
-          <h2 class="text-lg text-bone">Payment</h2>
-          <label class="flex items-start gap-3 rounded-sm border border-gold/40 bg-gold/5 p-4 cursor-pointer">
-            <input type="radio" name="payment" value="payfast" checked class="mt-1 accent-[#B8944F]" />
-            <span>
-              <span class="block text-bone">PayFast &mdash; Card, EFT or Instant EFT</span>
-              <span class="block text-xs text-stone mt-1">
-                Secure South African payment gateway. You'll be redirected to PayFast to complete payment.
-              </span>
-            </span>
-          </label>
-          <p class="text-xs text-stone">
-            PayFast checkout is wired as a placeholder for this MVP — the merchant ID, signature and ITN
-            webhook need to be added server-side before going live. See the README for integration notes.
-          </p>
-        </div>
+    
 
         <button type="submit" class="btn-gold w-full">Place Order</button>
       </form>

@@ -113,44 +113,7 @@ import { product, testimonials } from '../../data/product.js';
     </div>
   </section>
 
-  <!-- How to use -->
-  <section class="border-b border-white/5 bg-charcoal/40">
-    <div class="container-page py-16">
-      <p class="eyebrow reveal mb-3">How to Use</p>
-      <h2 class="reveal text-3xl text-bone mb-10">Four steps. Fifteen seconds.</h2>
-      <div class="grid gap-6 md:grid-cols-4">
-        {product.howToUse.map((s, i) => (
-          <div class="reveal" style={`transition-delay:${i * 70}ms`}>
-            <span class="font-mono text-2xl text-gold">{s.step}</span>
-            <h3 class="mt-3 text-lg text-bone">{s.title}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-stone">{s.description}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Reviews -->
-  <section>
-    <div class="container-page py-16">
-      <p class="eyebrow reveal mb-3">Reviews</p>
-      <h2 class="reveal text-3xl text-bone mb-10">{product.rating} average from {product.reviewCount} beards.</h2>
-      <div class="grid gap-6 md:grid-cols-3">
-        {testimonials.map((t, i) => (
-          <figure class="reveal card p-6" style={`transition-delay:${i * 70}ms`}>
-            <div class="flex gap-1 text-gold" aria-hidden="true">
-              {Array.from({ length: t.rating }).map(() => (
-                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3L10 14.9 4.4 18l1.4-6.3L1 7.4l6.4-.6L10 1z"/></svg>
-              ))}
-            </div>
-            <blockquote class="mt-3 text-sm leading-relaxed text-bone/90">&ldquo;{t.quote}&rdquo;</blockquote>
-            <figcaption class="mt-4 text-xs text-stone">{t.name} &middot; {t.location}</figcaption>
-          </figure>
-        ))}
-      </div>
-    </div>
-  </section>
-
+  
   <script>
     import { addToCart } from '../../scripts/cart.js';
 
