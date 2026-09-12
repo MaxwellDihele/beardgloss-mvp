@@ -1,0 +1,195 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { product, testimonials } from '../../data/product.js';
+---
+
+<BaseLayout
+  title="Beard Gloss"
+  description="Beard Gloss strengthens and gives shine to hair. Free delivery across South Africa."
+>
+  <!-- Product hero -->
+  <section class="border-b border-white/5" id="details">
+    <div class="container-page grid gap-12 py-14 md:grid-cols-2 md:py-20">
+      <!-- Gallery -->
+      <div class="reveal">
+        <div class="card overflow-hidden">
+          <img id="main-image" src={product.images[0].src} alt={product.images[0].alt} class="h-auto w-full object-cover" />
+        </div>
+        <div class="mt-4 grid grid-cols-3 gap-3">
+          {product.images.map((img) => (
+            <button type="button" data-thumb data-src={img.src} data-alt={img.alt} class="card overflow-hidden p-0">
+              <img src={img.src} alt={img.alt} class="h-24 w-full object-cover opacity-70 transition-opacity hover:opacity-100" />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="reveal">
+        <p class="eyebrow mb-3">{product.sku}</p>
+        <h1 class="text-3xl text-bone md:text-4xl">{product.name}</h1>
+        <p class="mt-3 text-stone">{product.tagline}</p>
+
+        <div class="mt-4 flex items-center gap-2">
+          <div class="flex gap-0.5 text-gold" aria-hidden="true">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <svg width="14" height="14" viewBox="0 0 20 20" fill={i < Math.round(product.rating) ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="1"><path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3L10 14.9 4.4 18l1.4-6.3L1 7.4l6.4-.6L10 1z"/></svg>
+            ))}
+          </div>
+          <span class="text-xs text-stone">{product.rating} ({product.reviewCount} reviews)</span>
+        </div>
+
+        <div class="mt-6 flex items-baseline gap-3">
+          <span class="text-3xl text-gold-bright">R{product.price}</span>
+          <span class="text-sm text-stone line-through">R{product.compareAtPrice}</span>
+          <span class="rounded-sm bg-gold/10 px-2 py-1 text-[11px] text-gold">
+            Save R{product.compareAtPrice - product.price}
+          </span>
+        </div>
+
+        <div class="pour-rule my-7"></div>
+
+        <!-- Add to cart -->
+        <div class="flex items-center gap-4">
+          <div class="flex items-center rounded-sm border border-white/10">
+            <button id="qty-minus" class="px-4 py-3 text-stone hover:text-bone" aria-label="Decrease quantity">&minus;</button>
+            <span id="qty-value" class="w-10 text-center text-bone">1</span>
+            <button id="qty-plus" class="px-4 py-3 text-stone hover:text-bone" aria-label="Increase quantity">&plus;</button>
+          </div>
+
+          <button
+            id="add-to-cart"
+            data-id={product.id}
+            data-name={product.name}
+            data-price={product.price}
+            data-slug={product.slug}
+            class="btn-gold flex-1"
+          >
+            Add to Cart
+          </button>
+        </div>
+        <p id="add-confirm" class="mt-3 hidden text-sm text-gold-bright">
+          Added to cart. <a href="/checkout" class="underline">Checkout &rarr;</a>
+        </p>
+
+        <ul class="mt-8 space-y-2 text-xs text-stone">
+          <li class="flex items-center gap-2"><span class="h-1 w-1 rounded-full bg-gold"></span>Free delivery on orders over R600</li>
+          <li class="flex items-center gap-2"><span class="h-1 w-1 rounded-full bg-gold"></span>Dispatched within 24 hours from Johannesburg</li>
+          <li class="flex items-center gap-2"><span class="h-1 w-1 rounded-full bg-gold"></span>30-day money-back guarantee</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits -->
+  <section class="border-b border-white/5 bg-charcoal/40">
+    <div class="container-page py-16">
+      <p class="eyebrow reveal mb-3">Benefits</p>
+      <h2 class="reveal text-3xl text-bone mb-10">What Beard Gloss actually does.</h2>
+      <div class="grid gap-6 sm:grid-cols-2">
+        {product.benefits.map((b, i) => (
+          <div class="reveal card p-6" style={`transition-delay:${i * 60}ms`}>
+            <h3 class="text-lg text-gold-bright">{b.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-stone">{b.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Ingredients -->
+  <section class="border-b border-white/5">
+    <div class="container-page py-16">
+      <p class="eyebrow reveal mb-3">Ingredients</p>
+      <h2 class="reveal text-3xl text-bone mb-10">What's actually in the pouch.</h2>
+      <div class="reveal card divide-y divide-white/5">
+        {product.ingredients.map((ing) => (
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-5">
+            <span class="text-bone font-medium">{ing.name}</span>
+            <span class="text-sm text-stone">{ing.note}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- How to use -->
+  <section class="border-b border-white/5 bg-charcoal/40">
+    <div class="container-page py-16">
+      <p class="eyebrow reveal mb-3">How to Use</p>
+      <h2 class="reveal text-3xl text-bone mb-10">Four steps. Fifteen seconds.</h2>
+      <div class="grid gap-6 md:grid-cols-4">
+        {product.howToUse.map((s, i) => (
+          <div class="reveal" style={`transition-delay:${i * 70}ms`}>
+            <span class="font-mono text-2xl text-gold">{s.step}</span>
+            <h3 class="mt-3 text-lg text-bone">{s.title}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-stone">{s.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews -->
+  <section>
+    <div class="container-page py-16">
+      <p class="eyebrow reveal mb-3">Reviews</p>
+      <h2 class="reveal text-3xl text-bone mb-10">{product.rating} average from {product.reviewCount} beards.</h2>
+      <div class="grid gap-6 md:grid-cols-3">
+        {testimonials.map((t, i) => (
+          <figure class="reveal card p-6" style={`transition-delay:${i * 70}ms`}>
+            <div class="flex gap-1 text-gold" aria-hidden="true">
+              {Array.from({ length: t.rating }).map(() => (
+                <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1l2.6 5.8 6.4.6-4.8 4.3 1.4 6.3L10 14.9 4.4 18l1.4-6.3L1 7.4l6.4-.6L10 1z"/></svg>
+              ))}
+            </div>
+            <blockquote class="mt-3 text-sm leading-relaxed text-bone/90">&ldquo;{t.quote}&rdquo;</blockquote>
+            <figcaption class="mt-4 text-xs text-stone">{t.name} &middot; {t.location}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <script>
+    import { addToCart } from '../../scripts/cart.js';
+
+    let quantity = 1;
+    const qtyValue = document.getElementById('qty-value');
+    const minusBtn = document.getElementById('qty-minus');
+    const plusBtn = document.getElementById('qty-plus');
+    const addBtn = document.getElementById('add-to-cart');
+    const confirmMsg = document.getElementById('add-confirm');
+
+    function renderQty() {
+      if (qtyValue) qtyValue.textContent = String(quantity);
+    }
+
+    minusBtn?.addEventListener('click', () => {
+      quantity = Math.max(1, quantity - 1);
+      renderQty();
+    });
+
+    plusBtn?.addEventListener('click', () => {
+      quantity = Math.min(10, quantity + 1);
+      renderQty();
+    });
+
+    addBtn?.addEventListener('click', () => {
+      const { id, name, price, slug } = addBtn.dataset;
+      addToCart({ id, name, price: Number(price), slug }, quantity);
+      confirmMsg?.classList.remove('hidden');
+      setTimeout(() => confirmMsg?.classList.add('hidden'), 2500);
+    });
+
+    const mainImage = document.getElementById('main-image');
+    document.querySelectorAll('[data-thumb]').forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        if (mainImage) {
+          mainImage.src = thumb.dataset.src;
+          mainImage.alt = thumb.dataset.alt;
+        }
+      });
+    });
+  </script>
+</BaseLayout>

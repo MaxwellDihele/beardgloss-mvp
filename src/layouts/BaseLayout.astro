@@ -1,0 +1,78 @@
+---
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import WhatsAppButton from '../components/WhatsAppButton.astro';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+}
+
+const {
+  title,
+  description = 'BeardGloss strengthens and gives shine to hair for a sharper, more controlled beard. Free delivery across South Africa.',
+  image = '/images/product/beard-gloss-main.jpg',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="en-ZA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <link rel="canonical" href={canonicalURL} />
+
+    <title>{title} | BeardGloss</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0C0B0A" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} | BeardGloss`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={new URL(image, Astro.site)} />
+    <meta property="og:locale" content="en_ZA" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} | BeardGloss`} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <Navbar />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+    <WhatsAppButton />
+
+    <script>
+      import { initReveal } from '../scripts/reveal.js';
+      import { getCartCount } from '../scripts/cart.js';
+
+      function refreshCartBadge() {
+        const badge = document.querySelectorAll('[data-cart-count]');
+        const count = getCartCount();
+        badge.forEach((el) => {
+          el.textContent = String(count);
+          el.classList.toggle('opacity-0', count === 0);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        initReveal();
+        refreshCartBadge();
+      });
+      window.addEventListener('cart:updated', refreshCartBadge);
+    </script>
+  </body>
+</html>

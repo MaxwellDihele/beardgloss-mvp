@@ -1,0 +1,100 @@
+---
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/product/beard-gloss', label: 'Beard Gloss' },
+];
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  id="site-header"
+  class="sticky top-0 z-50 border-b border-white/5 bg-ink/80 backdrop-blur-md transition-shadow"
+>
+  <div class="container-page flex h-16 items-center justify-between md:h-20">
+    <a href="/" class="flex items-center gap-2 group" aria-label="BeardGloss home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="shrink-0">
+        <path d="M12 2C9 6 6 9.5 6 13.5C6 17.6 8.7 21 12 21C15.3 21 18 17.6 18 13.5C18 9.5 15 6 12 2Z"
+          stroke="#B8944F" stroke-width="1.4" fill="none" />
+        <path d="M12 6.5C10.3 9 9 11.2 9 13.6C9 16 10.3 18 12 18"
+          stroke="#D9B872" stroke-width="1" fill="none" />
+      </svg>
+      <span class="font-display text-lg tracking-wide text-bone">Beard<span class="text-gold">Gloss</span></span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-9" aria-label="Primary">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class={`text-sm tracking-wide transition-colors ${
+            currentPath === link.href ? 'text-gold-bright' : 'text-stone hover:text-bone'
+          }`}
+        >
+          {link.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <a href="/checkout" class="relative flex items-center gap-2 text-bone hover:text-gold-bright transition-colors" aria-label="Go to checkout">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="9" cy="21" r="1" />
+          <circle cx="19" cy="21" r="1" />
+          <path d="M1 1h3l2.6 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L21 6H5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span
+          data-cart-count
+          class="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold text-ink opacity-0 transition-opacity"
+        >0</span>
+      </a>
+
+      <button
+        id="menu-toggle"
+        class="md:hidden flex flex-col gap-1.5 p-2 -mr-2"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <span class="block h-px w-6 bg-bone"></span>
+        <span class="block h-px w-6 bg-bone"></span>
+      </button>
+    </div>
+  </div>
+
+  <nav
+    id="mobile-menu"
+    class="md:hidden hidden flex-col border-t border-white/5 bg-ink px-6 py-4"
+    aria-label="Mobile"
+  >
+    {links.map((link) => (
+      <a
+        href={link.href}
+        class={`block py-3 text-sm tracking-wide border-b border-white/5 last:border-0 ${
+          currentPath === link.href ? 'text-gold-bright' : 'text-stone'
+        }`}
+      >
+        {link.label}
+      </a>
+    ))}
+  </nav>
+</header>
+
+<script>
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('mobile-menu');
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = !menu?.classList.contains('hidden');
+    menu?.classList.toggle('hidden');
+    menu?.classList.toggle('flex');
+    toggle.setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 8) {
+      header?.classList.add('shadow-[0_8px_30px_-15px_rgba(0,0,0,0.6)]');
+    } else {
+      header?.classList.remove('shadow-[0_8px_30px_-15px_rgba(0,0,0,0.6)]');
+    }
+  });
+</script>

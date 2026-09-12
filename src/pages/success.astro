@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Order Confirmed" description="Your BeardGloss order has been placed.">
+  <section class="container-page py-16 md:py-24">
+    <div id="success-empty" class="hidden card mx-auto max-w-lg p-12 text-center">
+      <p class="text-stone">We couldn't find a recent order. If you just checked out, try refreshing.</p>
+      <a href="/" class="btn-gold mt-6 inline-flex">Back to Home</a>
+    </div>
+
+    <div id="success-content" class="hidden mx-auto max-w-xl text-center">
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gold/10">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D9B872" stroke-width="1.6"><path d="M4 12l5 5L20 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <h1 class="mt-6 text-3xl text-bone md:text-4xl">Order confirmed.</h1>
+      <p class="mt-3 text-stone">
+        Thank you<span id="success-name"></span> — order <span id="success-order-number" class="text-gold-bright"></span> is being prepared for delivery.
+      </p>
+
+      <div class="card mt-10 p-6 text-left">
+        <h2 class="text-lg text-bone mb-4">Order Summary</h2>
+        <div id="success-items" class="space-y-3 mb-5"></div>
+        <div class="pour-rule mb-4"></div>
+        <div class="flex justify-between text-sm text-stone mb-2">
+          <span>Subtotal</span>
+          <span id="success-subtotal"></span>
+        </div>
+        <div class="flex justify-between text-sm text-stone mb-4">
+          <span>Delivery</span>
+          <span id="success-delivery"></span>
+        </div>
+        <div class="pour-rule mb-4"></div>
+        <div class="flex justify-between text-base text-bone mb-6">
+          <span>Total</span>
+          <span id="success-total" class="text-gold-bright"></span>
+        </div>
+
+        <h3 class="text-sm text-bone mb-1">Delivering to</h3>
+        <p class="text-sm text-stone" id="success-address"></p>
+      </div>
+
+      <div class="card mt-8 p-6 text-left">
+        <h2 class="text-lg text-bone">Create an account to track your orders</h2>
+        <p class="mt-2 text-sm text-stone">
+          Totally optional — you'll always be able to check out as a guest. An account just makes it
+          quicker to reorder and track delivery next time.
+        </p>
+        <div class="mt-4 flex flex-col gap-3 sm:flex-row">
+          <a href="/" class="btn-outline flex-1">Maybe later</a>
+          <button id="create-account-btn" class="btn-gold flex-1">Create Account</button>
+        </div>
+      </div>
+
+      <a href="/" class="mt-8 inline-block text-sm text-stone hover:text-bone">&larr; Back to home</a>
+    </div>
+  </section>
+
+  <script>
+    import { getLastOrder } from '../scripts/order.js';
+    import { formatZAR } from '../scripts/cart.js';
+
+    const order = getLastOrder();
+    const emptyEl = document.getElementById('success-empty');
+    const contentEl = document.getElementById('success-content');
+
+    if (!order) {
+      emptyEl?.classList.remove('hidden');
+    } else {
+      contentEl?.classList.remove('hidden');
+
+      document.getElementById('success-name').textContent = order.customer?.fullName ? `, ${order.customer.fullName.split(' ')[0]}` : '';
+      document.getElementById('success-order-number').textContent = `#${order.orderNumber}`;
+      document.getElementById('success-address').textContent = order.customer?.address || '';
+
+      const itemsEl = document.getElementById('success-items');
+      order.items.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'flex justify-between text-sm';
+        row.innerHTML = `<span class="text-stone">${item.name} &times; ${item.quantity}</span><span class="text-bone">${formatZAR(item.price * item.quantity)}</span>`;
+        itemsEl.appendChild(row);
+      });
+
+      document.getElementById('success-subtotal').textContent = formatZAR(order.subtotal);
+      document.getElementById('success-delivery').textContent = order.delivery === 0 ? 'Free' : formatZAR(order.delivery);
+      document.getElementById('success-total').textContent = formatZAR(order.total);
+    }
+
+    document.getElementById('create-account-btn')?.addEventListener('click', () => {
+      alert('Account creation is coming soon — you will be notified by email once it is available.');
+    });
+  </script>
+</BaseLayout>

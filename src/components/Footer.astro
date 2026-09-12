@@ -1,0 +1,37 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-white/5 bg-charcoal">
+  <div class="container-page py-14 grid gap-10 md:grid-cols-4">
+    <div class="md:col-span-2">
+      <span class="font-display text-xl text-bone">Beard<span class="text-gold">Gloss</span></span>
+      <p class="mt-4 max-w-xs text-sm text-stone leading-relaxed">
+        Strengthen and give shine to hair — made for South African climates and the men who don't have time to fuss.
+      </p>
+    </div>
+
+    <div>
+      <p class="eyebrow mb-4">Shop</p>
+      <ul class="space-y-2 text-sm text-stone">
+        <li><a href="/product/beard-gloss" class="hover:text-gold-bright transition-colors">Beard Gloss</a></li>
+        <li><a href="/checkout" class="hover:text-gold-bright transition-colors">Checkout</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="eyebrow mb-4">Contact</p>
+      <ul class="space-y-2 text-sm text-stone">
+        <li><a href="mailto:hello@beardgloss.co.za" class="hover:text-gold-bright transition-colors">hello@beardgloss.co.za</a></li>
+        <li><a href="tel:+27100000000" class="hover:text-gold-bright transition-colors">+27 10 000 0000</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pour-rule"></div>
+
+  <div class="container-page py-6 flex flex-col-reverse md:flex-row items-center justify-between gap-3 text-xs text-stone">
+    <p>&copy; {year} BeardGloss. All rights reserved.</p>
+    <p>Made for beards that mean business. Proudly South African.</p>
+  </div>
+</footer>

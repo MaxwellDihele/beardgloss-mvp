@@ -1,0 +1,229 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Checkout" description="Guest checkout — no account required.">
+  <section class="container-page py-14 md:py-20">
+    <p class="eyebrow mb-3">Step 2 of 2</p>
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-10">
+      <h1 class="text-3xl text-bone md:text-4xl">Checkout</h1>
+      <span class="rounded-sm bg-gold/10 px-3 py-1 text-xs text-gold">Guest checkout &mdash; no account needed</span>
+    </div>
+
+    <div id="checkout-empty" class="hidden card p-12 text-center">
+      <p class="text-stone">Your cart is empty, so there's nothing to check out yet.</p>
+      <a href="/product/beard-gloss" class="btn-gold mt-6 inline-flex">Shop Beard Gloss</a>
+    </div>
+
+    <div id="checkout-content" class="hidden grid gap-10 lg:grid-cols-3">
+      <form id="checkout-form" class="lg:col-span-2 space-y-8" novalidate>
+        <div class="card p-6 space-y-5">
+          <h2 class="text-lg text-bone">Contact & Delivery</h2>
+          <p class="text-xs text-stone -mt-3">We only use these details to fulfil and update you on this order.</p>
+
+          <div>
+            <label for="fullName" class="block text-sm text-stone mb-2">Full Name</label>
+            <input
+              id="fullName" name="fullName" type="text" autocomplete="name" required
+              class="w-full rounded-sm border border-white/10 bg-charcoal-raised px-4 py-3 text-bone placeholder:text-stone/50 focus:border-gold"
+              placeholder="Thabo Nkosi"
+            />
+            <p class="mt-1 hidden text-xs text-red-400" data-error="fullName">Please enter your full name.</p>
+          </div>
+
+          <div class="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label for="email" class="block text-sm text-stone mb-2">Email</label>
+              <input
+                id="email" name="email" type="email" autocomplete="email" required
+                class="w-full rounded-sm border border-white/10 bg-charcoal-raised px-4 py-3 text-bone placeholder:text-stone/50 focus:border-gold"
+                placeholder="you@email.com"
+              />
+              <p class="mt-1 hidden text-xs text-red-400" data-error="email">Enter a valid email address.</p>
+            </div>
+
+            <div>
+              <label for="phone" class="block text-sm text-stone mb-2">Phone Number</label>
+              <input
+                id="phone" name="phone" type="tel" autocomplete="tel" required
+                class="w-full rounded-sm border border-white/10 bg-charcoal-raised px-4 py-3 text-bone placeholder:text-stone/50 focus:border-gold"
+                placeholder="082 000 0000"
+              />
+              <p class="mt-1 hidden text-xs text-red-400" data-error="phone">Enter a valid phone number.</p>
+            </div>
+          </div>
+
+          <div>
+            <label for="address" class="block text-sm text-stone mb-2">Delivery Address</label>
+            <textarea
+              id="address" name="address" rows="3" autocomplete="street-address" required
+              class="w-full rounded-sm border border-white/10 bg-charcoal-raised px-4 py-3 text-bone placeholder:text-stone/50 focus:border-gold"
+              placeholder="Street address, suburb, city, postal code"
+            ></textarea>
+            <p class="mt-1 hidden text-xs text-red-400" data-error="address">Enter your delivery address.</p>
+          </div>
+        </div>
+
+        <div class="card p-6 space-y-4">
+          <h2 class="text-lg text-bone">Payment</h2>
+          <label class="flex items-start gap-3 rounded-sm border border-gold/40 bg-gold/5 p-4 cursor-pointer">
+            <input type="radio" name="payment" value="payfast" checked class="mt-1 accent-[#B8944F]" />
+            <span>
+              <span class="block text-bone">PayFast &mdash; Card, EFT or Instant EFT</span>
+              <span class="block text-xs text-stone mt-1">
+                Secure South African payment gateway. You'll be redirected to PayFast to complete payment.
+              </span>
+            </span>
+          </label>
+          <p class="text-xs text-stone">
+            PayFast checkout is wired as a placeholder for this MVP — the merchant ID, signature and ITN
+            webhook need to be added server-side before going live. See the README for integration notes.
+          </p>
+        </div>
+
+        <button type="submit" class="btn-gold w-full">Place Order</button>
+      </form>
+
+      <aside class="card h-fit p-6" id="order-summary">
+        <h2 class="text-lg text-bone mb-5">Order Summary</h2>
+        <div id="summary-items" class="space-y-3 mb-5"></div>
+        <div class="pour-rule mb-4"></div>
+        <div class="flex justify-between text-sm text-stone mb-2">
+          <span>Subtotal</span>
+          <span id="checkout-subtotal">R0.00</span>
+        </div>
+        <div class="flex justify-between text-sm text-stone mb-4">
+          <span>Delivery</span>
+          <span id="checkout-delivery">R0.00</span>
+        </div>
+        <div class="pour-rule mb-4"></div>
+        <div class="flex justify-between text-base text-bone">
+          <span>Total</span>
+          <span id="checkout-total" class="text-gold-bright">R0.00</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <script>
+    import { getCart, getCartTotal, formatZAR, clearCart } from '../scripts/cart.js';
+    import { saveOrder, generateOrderNumber } from '../scripts/order.js';
+
+    const FREE_DELIVERY_THRESHOLD = 600;
+    const DELIVERY_FEE = 85;
+
+    const emptyEl = document.getElementById('checkout-empty');
+    const contentEl = document.getElementById('checkout-content');
+    const summaryItems = document.getElementById('summary-items');
+    const subtotalEl = document.getElementById('checkout-subtotal');
+    const deliveryEl = document.getElementById('checkout-delivery');
+    const totalEl = document.getElementById('checkout-total');
+    const form = document.getElementById('checkout-form');
+
+    function computeTotals() {
+      const subtotal = getCartTotal();
+      const delivery = subtotal === 0 || subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
+      return { subtotal, delivery, total: subtotal + delivery };
+    }
+
+    function renderSummary() {
+      const items = getCart();
+
+      if (!items.length) {
+        emptyEl?.classList.remove('hidden');
+        contentEl?.classList.add('hidden');
+        return false;
+      }
+
+      emptyEl?.classList.add('hidden');
+      contentEl?.classList.remove('hidden');
+      contentEl?.classList.add('grid');
+
+      summaryItems.innerHTML = '';
+      items.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'flex justify-between text-sm';
+        row.innerHTML = `<span class="text-stone">${item.name} &times; ${item.quantity}</span><span class="text-bone">${formatZAR(item.price * item.quantity)}</span>`;
+        summaryItems.appendChild(row);
+      });
+
+      const { subtotal, delivery, total } = computeTotals();
+      subtotalEl.textContent = formatZAR(subtotal);
+      deliveryEl.textContent = delivery === 0 ? 'Free' : formatZAR(delivery);
+      totalEl.textContent = formatZAR(total);
+      return true;
+    }
+
+    const hasItems = renderSummary();
+
+    const validators = {
+      fullName: (v) => v.trim().length >= 2,
+      email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
+      phone: (v) => /^[0-9+()\s-]{7,15}$/.test(v.trim()),
+      address: (v) => v.trim().length >= 8,
+    };
+
+    function showError(field, show) {
+      const el = form?.querySelector(`[data-error="${field}"]`);
+      el?.classList.toggle('hidden', !show);
+    }
+
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!hasItems) return;
+
+      const data = new FormData(form);
+      let valid = true;
+
+      for (const field of Object.keys(validators)) {
+        const value = String(data.get(field) || '');
+        const ok = validators[field](value);
+        showError(field, !ok);
+        if (!ok) valid = false;
+      }
+
+      if (!valid) {
+        form.querySelector('.text-red-400:not(.hidden)')?.closest('div')?.querySelector('input, textarea')?.focus();
+        return;
+      }
+
+      const { subtotal, delivery, total } = computeTotals();
+
+      const order = {
+        orderNumber: generateOrderNumber(),
+        customer: {
+          fullName: data.get('fullName'),
+          email: data.get('email'),
+          phone: data.get('phone'),
+          address: data.get('address'),
+        },
+        paymentMethod: data.get('payment'),
+        items: getCart(),
+        subtotal,
+        delivery,
+        total,
+        placedAt: new Date().toISOString(),
+      };
+
+      // --- PayFast integration point -----------------------------------
+      // In production, replace the block below with a POST to your backend,
+      // which generates the PayFast signature server-side and returns a
+      // redirect URL, e.g.:
+      //
+      //   const res = await fetch('/api/payfast/create', {
+      //     method: 'POST',
+      //     body: JSON.stringify(order),
+      //   });
+      //   const { redirectUrl } = await res.json();
+      //   window.location.href = redirectUrl;
+      //
+      // For this MVP, we simulate a successful payment and go straight
+      // to the success page.
+      // -------------------------------------------------------------------
+
+      saveOrder(order);
+      clearCart();
+      window.location.href = '/success';
+    });
+  </script>
+</BaseLayout>
